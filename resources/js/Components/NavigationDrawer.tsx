@@ -43,12 +43,12 @@ export const NavigationDrawer = ({
       icon: <IconNote />,
       value: 'Laporan',
       subMenu: [
-        {
-          icon: <IconPackage />,
-          value: 'Permintaan',
-          route: 'permintaan.index',
-        },
-        { icon: <IconUser />, value: 'Pengiriman', route: 'pengiriman.index' },
+        // {
+        //   icon: <IconPackage />,
+        //   value: 'Permintaan',
+        //   route: 'permintaan.index',
+        // },
+        // { icon: <IconUser />, value: 'Pengiriman', route: 'pengiriman.index' },
       ],
     },
   ];

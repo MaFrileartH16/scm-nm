@@ -12,7 +12,6 @@ return new class extends Migration {
   {
     Schema::create('couriers', function (Blueprint $table) {
       $table->ulid('id')->primary();
-      $table->string('profile_photo_filename')->nullable();
       $table->string('name');
       $table->timestamps();
       $table->softDeletes();

@@ -33,7 +33,7 @@ export const LoginForm = () => {
           form.setError('email', 'Alamat surel tidak boleh kosong.');
           return;
         }
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value as string)) {
           form.setError('email', 'Format alamat surel tidak sah.');
           return;
         }

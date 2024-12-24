@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreItemRequest;
-use App\Http\Requests\UpdateItemRequest;
 use App\Models\Item;
+use Exception;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class ItemController extends Controller
@@ -17,7 +17,28 @@ class ItemController extends Controller
     return Inertia::render('Item/Index', [
       'page_title' => 'Daftar Barang',
       'response' => session()->pull('response'),
+      'items' => Item::all(),
     ]);
+  }
+
+  /**
+   * Store a newly created resource in storage.
+   */
+  public function store(Request $request)
+  {
+    try {
+      Item::create($request->only(['code', 'name', 'quantity', 'unit']));
+
+      return redirect()->route('items.index')->with('response', [
+        'status' => 'success',
+        'message' => 'Barang berhasil ditambahkan.',
+      ]);
+    } catch (Exception $e) {
+      return redirect()->route('items.index')->with('response', [
+        'status' => 'error',
+        'message' => 'Terjadi kesalahan saat menambahkan barang: ' . $e->getMessage(),
+      ]);
+    }
   }
 
   /**
@@ -25,15 +46,10 @@ class ItemController extends Controller
    */
   public function create()
   {
-    //
-  }
-
-  /**
-   * Store a newly created resource in storage.
-   */
-  public function store(StoreItemRequest $request)
-  {
-    //
+    return Inertia::render('Item/Create', [
+      'page_title' => 'Tambah Barang',
+      'response' => session()->pull('response'),
+    ]);
   }
 
   /**
@@ -41,7 +57,7 @@ class ItemController extends Controller
    */
   public function show(Item $item)
   {
-    //
+    // Implementasi jika diperlukan
   }
 
   /**
@@ -49,15 +65,31 @@ class ItemController extends Controller
    */
   public function edit(Item $item)
   {
-    //
+    return Inertia::render('Item/Edit', [
+      'page_title' => 'Ubah Barang',
+      'response' => session()->pull('response'),
+      'item' => $item,
+    ]);
   }
 
   /**
    * Update the specified resource in storage.
    */
-  public function update(UpdateItemRequest $request, Item $item)
+  public function update(Request $request, Item $item)
   {
-    //
+    try {
+      $item->update($request->only(['code', 'name', 'quantity', 'unit']));
+
+      return redirect()->route('items.index')->with('response', [
+        'status' => 'success',
+        'message' => 'Barang berhasil diubah.',
+      ]);
+    } catch (Exception $e) {
+      return redirect()->route('items.index')->with('response', [
+        'status' => 'error',
+        'message' => 'Terjadi kesalahan saat mengubah barang: ' . $e->getMessage(),
+      ]);
+    }
   }
 
   /**
@@ -65,6 +97,18 @@ class ItemController extends Controller
    */
   public function destroy(Item $item)
   {
-    //
+    try {
+      $item->delete();
+
+      return redirect()->route('items.index')->with('response', [
+        'status' => 'success',
+        'message' => 'Barang berhasil dihapus.',
+      ]);
+    } catch (Exception $e) {
+      return redirect()->route('items.index')->with('response', [
+        'status' => 'error',
+        'message' => 'Terjadi kesalahan saat menghapus barang: ' . $e->getMessage(),
+      ]);
+    }
   }
 }

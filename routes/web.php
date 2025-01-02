@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\BranchController;
+use App\Http\Controllers\ItemController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -12,6 +14,9 @@ Route::middleware('auth')->group(function () {
   ]))->name('dashboard');
 
   require __DIR__ . '/profile.php';
+//  Route::get('items', ItemController::class)->name('items');
+  Route::resource('items', ItemController::class);
+  Route::resource('branches', BranchController::class);
 });
 
 require __DIR__ . '/auth.php';

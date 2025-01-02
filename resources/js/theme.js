@@ -19,7 +19,7 @@ export const theme = createTheme({
     ],
   },
   fontFamily: 'Lexend Deca, sans-serif',
-  // primaryColor: 'amazon',
+  primaryColor: 'red',
   headings: {
     sizes: {
       h1: { fontSize: '44px' },

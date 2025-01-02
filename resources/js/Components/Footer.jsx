@@ -4,7 +4,7 @@ export const Footer = () => {
   const year = new Date().getFullYear();
   return (
     <Container p={16} c="neutral">
-      © {year} Penjadwalan Uji Emisi
+      © {year} AHASS Group
     </Container>
   );
 };

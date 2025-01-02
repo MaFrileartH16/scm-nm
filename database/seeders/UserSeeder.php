@@ -14,15 +14,15 @@ class UserSeeder extends Seeder
   {
     User::create([
       'full_name' => 'Admin',
-      'email' => 'admin@scm.id',
-      'password' => 'admin@scm.id',
+      'email' => 'admin@ahass.id',
+      'password' => 'admin@ahass.id',
       'role' => 'Admin',
     ]);
 
     User::create([
       'full_name' => 'Kurir',
-      'email' => 'kurir@scm.id',
-      'password' => 'kurir@scm.id',
+      'email' => 'kurir@ahass.id',
+      'password' => 'kurir@ahass.id',
       'role' => 'Kurir',
     ]);
 
@@ -35,8 +35,8 @@ class UserSeeder extends Seeder
 
     User::create([
       'full_name' => 'AHASS Wahana Motor II',
-      'email' => 'awm2@scm.id',
-      'password' => 'awm2@scm.id',
+      'email' => 'awm2@ahass.id',
+      'password' => 'awm2@ahass.id',
       'role' => 'Cabang',
     ]);
   }

@@ -52,7 +52,7 @@ const Login = (props) => {
               w="100%"
               autoFocus
               label="Alamat Surel"
-              placeholder="email@uji-emisi.id"
+              placeholder="email@ahass.id"
               value={form.data.email}
               onChange={(e) => form.setData('email', e.target.value)}
               required

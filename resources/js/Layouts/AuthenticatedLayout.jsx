@@ -5,13 +5,13 @@ import { Box, Container, Flex } from '@mantine/core';
 
 export const AuthenticatedLayout = (props) => {
   return (
-    <AppLayout title={props.title} notification={props.notification}>
-      <Header user={props.user} />
+    <AppLayout {...props.appLayoutProps}>
+      <Header {...props.headerProps} />
 
-      <Flex flexDirection="column" flex={1}>
+      <Flex flex={1}>
         <Box w="100%">
           <Container size="xl" p={16}>
-            <PageHeadings />
+            <PageHeadings {...props.pageHeadingsProps} />
 
             {props.children}
           </Container>

@@ -17,7 +17,7 @@ class AuthenticatedSessionController extends Controller
   {
     return Inertia::render('Auth/Login', [
       'page_title' => 'Masuk Akun',
-      'notification' => session()->pull('notification')
+      'notification' => session()->pull('notification'),
     ]);
   }
 
@@ -28,18 +28,18 @@ class AuthenticatedSessionController extends Controller
 
       $request->session()->regenerate();
 
-      return redirect()->intended(route('dashboard', absolute: false))
+      return redirect()->intended(route('items.index'))
         ->with('notification', [
           'status' => 'success',
-          'title' => 'Berhasil masuk akun',
-          'message' => 'Selamat datang kembali!',
+          'title' => 'Login Berhasil',
+          'message' => 'Selamat datang kembali.',
         ]);
     } catch (Exception $e) {
       return redirect()->route('login')
         ->with('notification', [
           'status' => 'error',
-          'title' => 'Gagal masuk akun',
-          'message' => 'Silahkan periksa kembali alamat surel dan kata sandi.',
+          'title' => 'Login Gagal',
+          'message' => 'Periksa kembali email dan kata sandi Anda.',
         ]);
     }
   }
@@ -50,21 +50,20 @@ class AuthenticatedSessionController extends Controller
       Auth::guard('web')->logout();
 
       $request->session()->invalidate();
-
       $request->session()->regenerateToken();
 
       return redirect()->route('login')
         ->with('notification', [
           'status' => 'success',
-          'title' => 'Berhasil keluar akun',
-          'message' => 'Sampai jumpa kembali!',
+          'title' => 'Logout Berhasil',
+          'message' => 'Anda telah keluar dari akun.',
         ]);
     } catch (Exception $e) {
       return redirect()->route('dashboard')
         ->with('notification', [
           'status' => 'error',
-          'title' => 'Gagal keluar akun',
-          'message' => 'Terjadi kesalahan saat mencoba keluar akun. Silakan coba lagi.',
+          'title' => 'Logout Gagal',
+          'message' => 'Terjadi kesalahan, coba lagi.',
         ]);
     }
   }

@@ -9,16 +9,13 @@ import {
   Divider,
   Drawer,
   Group,
-  Indicator,
   Menu,
   Stack,
-  Text,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import {
   IconDashboard,
   IconDatabase,
-  IconId,
   IconLogout,
   IconMenu,
   IconX,
@@ -27,31 +24,76 @@ import {
 export const Header = (props) => {
   const [opened, { open, close }] = useDisclosure(false);
 
-  const drawerMenuItems = [
-    {
-      label: 'Dasbor',
-      icon: <IconDashboard />,
-      type: 'button',
-    },
-    {
-      label: 'Master',
-      icon: <IconDatabase />,
-      type: 'accordion',
-      submenu: [
-        { label: 'Supir', icon: <IconDashboard /> },
-        { label: 'Kendaraan', icon: <IconDashboard /> },
-        { label: 'Dasbor', icon: <IconDashboard /> },
-      ],
-    },
-  ];
+  const getDrawerMenuItems = (role) => {
+    switch (role) {
+      case 'Admin':
+        return [
+          {
+            label: 'Master',
+            icon: <IconDatabase />,
+            type: 'accordion',
+            submenu: [
+              { label: 'Barang', icon: <IconDashboard /> },
+              { label: 'Cabang', icon: <IconDashboard /> },
+              { label: 'Kurir', icon: <IconDashboard /> },
+            ],
+          },
+          {
+            label: 'Laporan',
+            icon: <IconDatabase />,
+            type: 'accordion',
+            submenu: [
+              { label: 'Permintaan', icon: <IconDashboard /> },
+              { label: 'Print Surat Jalan', icon: <IconDashboard /> },
+              { label: 'Pengiriman', icon: <IconDashboard /> },
+            ],
+          },
+        ];
+      case 'Kurir':
+        return [
+          {
+            label: 'Laporan',
+            icon: <IconDatabase />,
+            type: 'accordion',
+            submenu: [
+              { label: 'Permintaan', icon: <IconDashboard /> },
+              { label: 'Update Status', icon: <IconDashboard /> },
+            ],
+          },
+        ];
+      case 'Cabang':
+        return [
+          {
+            label: 'Master',
+            icon: <IconDatabase />,
+            type: 'accordion',
+            submenu: [{ label: 'Barang', icon: <IconDashboard /> }],
+          },
+          {
+            label: 'Laporan',
+            icon: <IconDatabase />,
+            type: 'accordion',
+            submenu: [
+              { label: 'Permintaan', icon: <IconDashboard /> },
+              {
+                label: 'Status Kurir',
+                icon: <IconDashboard />,
+              },
+              {
+                label: 'Stok',
+                icon: <IconDashboard />,
+              },
+            ],
+          },
+        ];
+      default:
+        return [];
+    }
+  };
+
+  const drawerMenuItems = getDrawerMenuItems(props.user.role);
 
   const userMenuItems = [
-    {
-      label: 'Profil Saya',
-      icon: <IconId style={{ marginRight: 8 }} />,
-      onClick: () => router.get(route('profile.edit')),
-      color: '#333',
-    },
     {
       label: 'Keluar akun',
       icon: <IconLogout style={{ marginRight: 8 }} />,
@@ -64,9 +106,9 @@ export const Header = (props) => {
     <Box>
       <Container size="xl" py={16}>
         <Group justify="space-between">
+          {/* Drawer for menu */}
           <Drawer.Root opened={opened} onClose={close} size="xs">
             <Drawer.Overlay />
-
             <Drawer.Content>
               <Drawer.Header p={16}>
                 <Drawer.Title>Menu</Drawer.Title>
@@ -74,7 +116,6 @@ export const Header = (props) => {
                   <IconX />
                 </ActionIcon>
               </Drawer.Header>
-
               <Drawer.Body
                 style={{
                   display: 'flex',
@@ -109,7 +150,7 @@ export const Header = (props) => {
                       <Accordion.Item value={menuItem.label}>
                         <Accordion.Control
                           icon={menuItem.icon}
-                          c="blue"
+                          c="red"
                           h={48}
                           style={{
                             borderRadius: 16,
@@ -117,7 +158,6 @@ export const Header = (props) => {
                         >
                           {menuItem.label}
                         </Accordion.Control>
-
                         <Accordion.Panel>
                           <Stack gap={8}>
                             {menuItem.submenu.map((subItem, subIndex) => (
@@ -145,47 +185,21 @@ export const Header = (props) => {
             </Drawer.Content>
           </Drawer.Root>
 
+          {/* Menu toggle button */}
           <ActionIcon variant="subtle" onClick={open} size={48}>
             <IconMenu />
           </ActionIcon>
 
+          {/* User dropdown */}
           <Menu position="bottom-end" withArrow arrowPosition="center">
             <Menu.Target>
-              <Indicator
-                styles={{
-                  indicator: {
-                    height: 24,
-                    padding: 8,
-                    fontSize: 14,
-                  },
-                }}
-                fz={14}
-                inline
-                label={props.user.role}
-                size={16}
-                position="bottom-start"
-                withBorder
-              >
-                <Button variant="subtle" w={48} h={48} p={4}>
-                  <Avatar radius="md" color="blue">
-                    {props.user.full_name[0]}
-                  </Avatar>
-                </Button>
-              </Indicator>
+              <Button variant="subtle" w={48} h={48} p={4}>
+                <Avatar radius="md" color="red">
+                  {props.user.full_name[0]}
+                </Avatar>
+              </Button>
             </Menu.Target>
-
             <Menu.Dropdown p={8}>
-              <Box px={20}>
-                <Text fz={16} fw={500} mb={4} c="#333">
-                  {props.user.full_name}
-                </Text>
-                <Text fz={14} c="#777">
-                  {props.user.email}
-                </Text>
-              </Box>
-
-              <Menu.Divider my={8} style={{ borderColor: '#ddd' }} />
-
               {userMenuItems.map((item, index) => (
                 <Menu.Item
                   key={index}
@@ -207,7 +221,6 @@ export const Header = (props) => {
           </Menu>
         </Group>
       </Container>
-
       <Divider />
     </Box>
   );

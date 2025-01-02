@@ -1,24 +1,35 @@
-import { Anchor, Box, Breadcrumbs, Flex, Title } from '@mantine/core';
+import { router } from '@inertiajs/react';
+import { Anchor, Breadcrumbs, Button, Flex, Title } from '@mantine/core';
+import { IconPlus } from '@tabler/icons-react';
 
-export const PageHeadings = () => {
-  const items = [
-    { title: 'Mantine', href: '#' },
-    { title: 'Mantine hooks', href: '#' },
-    { title: 'use-id', href: '#' },
-  ].map((item, index) => (
-    <Anchor href={item.href} key={index}>
+export const PageHeadings = (props) => {
+  const breadcrumbItems = props.breadcrumbs?.map((item, index) => (
+    <Anchor onClick={() => router.get(route(item.route))} key={index}>
       {item.title}
     </Anchor>
   ));
 
   return (
-    <Flex bg="red">
-      <Box bg="yellow">
-        <Breadcrumbs>{items}</Breadcrumbs>
+    <Flex direction="column" gap={16} mt={16} mb={32}>
+      {breadcrumbItems && <Breadcrumbs>{breadcrumbItems}</Breadcrumbs>}
+      <Flex justify="space-between" align="center">
         <Title fz={34} fw={800}>
-          Dashboard
+          {props.title || 'Default Title'}
         </Title>
-      </Box>
+
+        {props.actionButtonProps.isVisible && (
+          <Button
+            variant="filled"
+            type={props.actionButtonProps.type}
+            h={48}
+            px={16}
+            leftSection={<IconPlus />}
+            onClick={props.actionButtonProps.onClick}
+          >
+            {props.actionButtonProps.label || 'Action'}
+          </Button>
+        )}
+      </Flex>
     </Flex>
   );
 };

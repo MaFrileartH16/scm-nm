@@ -12,16 +12,15 @@ return new class extends Migration {
   {
     Schema::create('users', function (Blueprint $table) {
       $table->ulid('id')->primary();
-//      $table->string('profile_photo_filename')->nullable();
-      $table->string('name');
+      $table->string('full_name');
+      $table->enum('role', ['Admin', 'Cabang', 'Kurir']);
       $table->string('email')->unique();
       $table->timestamp('email_verified_at')->nullable();
       $table->string('password');
-      $table->enum('account_type', ['admin', 'branch', 'courier']);
       $table->rememberToken();
       $table->timestamps();
-      $table->softDeletes();
     });
+
 
     Schema::create('password_reset_tokens', function (Blueprint $table) {
       $table->string('email')->primary();
@@ -31,8 +30,7 @@ return new class extends Migration {
 
     Schema::create('sessions', function (Blueprint $table) {
       $table->string('id')->primary();
-      $table->string('user_id', 26)->nullable()->index();
-      $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+      $table->foreignUlid('user_id')->nullable()->index();
       $table->string('ip_address', 45)->nullable();
       $table->text('user_agent')->nullable();
       $table->longText('payload');

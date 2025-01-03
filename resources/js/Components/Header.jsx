@@ -33,9 +33,21 @@ export const Header = (props) => {
             icon: <IconDatabase />,
             type: 'accordion',
             submenu: [
-              { label: 'Barang', icon: <IconDashboard /> },
-              { label: 'Cabang', icon: <IconDashboard /> },
-              { label: 'Kurir', icon: <IconDashboard /> },
+              {
+                label: 'Barang',
+                icon: <IconDashboard />,
+                route: 'items.index',
+              },
+              {
+                label: 'Cabang',
+                icon: <IconDashboard />,
+                route: 'branches.index',
+              },
+              {
+                label: 'Kurir',
+                icon: <IconDashboard />,
+                route: 'couriers.index',
+              },
             ],
           },
           {
@@ -171,6 +183,7 @@ export const Header = (props) => {
                                 variant="subtle"
                                 px={16}
                                 display="flex"
+                                onClick={() => router.get(route(subItem.route))}
                               >
                                 {subItem.label}
                               </Button>

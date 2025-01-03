@@ -59,7 +59,7 @@ const Index = (props) => {
       pageHeadingsProps={{
         title: props.page_title,
         actionButtonProps: {
-          isVisible: true,
+          isVisible: props.auth.user.role === 'Admin',
           label: 'Tambah',
           onClick: () => router.get(route('items.create')),
         },

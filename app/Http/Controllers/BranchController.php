@@ -15,7 +15,7 @@ class BranchController extends Controller
    */
   public function index(): Response
   {
-    $branches = User::branches()->get(); // Fetch all users with the role "Branch"
+    $branches = User::where('role', 'Cabang')->get();
 
     return Inertia::render('Branches/Index', [
       'page_title' => 'Daftar Cabang',

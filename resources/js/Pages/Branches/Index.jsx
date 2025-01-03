@@ -5,13 +5,13 @@ import { IconEdit, IconTrash } from '@tabler/icons-react';
 import { MantineReactTable, useMantineReactTable } from 'mantine-react-table';
 
 const Index = (props) => {
-  const data = props.items || []; // Safeguard to handle missing data
+  console.log(props);
+  const data = props.branches || []; // Safeguard to handle missing data
 
   const columns = [
-    { accessorKey: 'code', header: 'Kode Barang' },
-    { accessorKey: 'name', header: 'Nama Barang' },
-    { accessorKey: 'quantity', header: 'Stok' },
-    { accessorKey: 'unit', header: 'Satuan' },
+    { accessorKey: 'full_name', header: 'Nama Lengkap' },
+    { accessorKey: 'role', header: 'Peran' },
+    { accessorKey: 'email', header: 'Email' },
     {
       accessorKey: 'actions',
       header: 'Aksi',
@@ -22,7 +22,7 @@ const Index = (props) => {
             variant="subtle"
             color="yellow"
             onClick={() =>
-              router.get(route('items.edit', { id: row.original.id }))
+              router.get(route('users.edit', { id: row.original.id }))
             }
           >
             <IconEdit />
@@ -32,7 +32,7 @@ const Index = (props) => {
             variant="subtle"
             color="red"
             onClick={() =>
-              router.delete(route('items.destroy', { id: row.original.id }))
+              router.delete(route('users.destroy', { id: row.original.id }))
             }
           >
             <IconTrash />
@@ -59,9 +59,9 @@ const Index = (props) => {
       pageHeadingsProps={{
         title: props.page_title,
         actionButtonProps: {
-          isVisible: true,
-          label: 'Tambah',
-          onClick: () => router.get(route('items.create')),
+          isVisible: props.auth.user.role === 'Admin',
+          label: 'Tambah Pengguna',
+          onClick: () => router.get(route('users.create')),
         },
       }}
     >

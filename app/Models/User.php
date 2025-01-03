@@ -39,9 +39,4 @@ class User extends Authenticatable
   {
     return ucfirst($value);
   }
-
-  public function scopeBranches($query)
-  {
-    return $query->where('role', 'Branch');
-  }
 }

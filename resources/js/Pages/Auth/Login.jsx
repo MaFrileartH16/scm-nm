@@ -5,6 +5,7 @@ import {
   Button,
   Container,
   Flex,
+  Image,
   Space,
   TextInput,
   Title,
@@ -44,6 +45,13 @@ const Login = (props) => {
               flex: 1,
             }}
           >
+            <Image
+              h={48}
+              w={48}
+              mb={16}
+              src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Honda_Logo.svg/1120px-Honda_Logo.svg.png"
+            />
+
             <Title align="center">Masuk Akun</Title>
 
             <Space h={32} />

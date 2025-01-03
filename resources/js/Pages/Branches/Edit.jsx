@@ -1,28 +1,33 @@
 import { AuthenticatedLayout } from '@/Layouts/AuthenticatedLayout.jsx';
 import { router } from '@inertiajs/react';
-import { NumberInput, Select, TextInput } from '@mantine/core';
+import { TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 
-const Edit = (props) => {
+const EditBranch = (props) => {
   const form = useForm({
     initialValues: {
-      code: props.item?.code || '',
-      name: props.item?.name || '',
-      quantity: props.item?.quantity || 0,
-      unit: props.item?.unit || '',
+      full_name: props.branch?.full_name || '',
+      phone_number: props.branch?.phone_number || '',
+      email: props.branch?.email || '',
+      password: '',
     },
     validate: {
-      code: (value) => (value.trim() ? null : 'Kode barang harus diisi'),
-      name: (value) => (value.trim() ? null : 'Nama barang harus diisi'),
-      quantity: (value) => (value > 0 ? null : 'Kuantitas harus lebih dari 0'),
-      unit: (value) => (value ? null : 'Satuan harus dipilih'),
+      full_name: (value) => (value.trim() ? null : 'Nama cabang harus diisi'),
+      phone_number: (value) =>
+        value.trim() ? null : 'Nomor telepon cabang harus diisi',
+      email: (value) =>
+        /^\S+@\S+\.\S+$/.test(value) ? null : 'Email tidak valid',
+      password: (value) =>
+        value.length === 0 || value.length >= 8
+          ? null
+          : 'Kata sandi minimal 8 karakter',
     },
   });
 
   const handleSubmit = (values) => {
-    router.put(route('items.update', { id: props.item.id }), values, {
+    router.put(route('branches.update', { id: props.branch.id }), values, {
       onSuccess: () => {
-        router.get(route('items.index'));
+        form.reset();
       },
     });
   };
@@ -40,75 +45,61 @@ const Edit = (props) => {
         pageHeadingsProps={{
           title: props.page_title,
           breadcrumbs: [
-            { title: 'Barang', route: 'items.index' },
-            {
-              title: 'Ubah',
-              route: 'items.edit',
-              params: { id: props.item.id },
-            },
+            { title: 'Cabang', route: 'branches.index' },
+            { title: 'Edit', route: 'branches.edit' },
           ],
           actionButtonProps: {
-            isVisible: true,
-            type: 'submit',
+            isVisible: props.auth.user.role === 'Admin',
             label: 'Simpan',
-            onClick: () => router.get(route('items.update')),
+            type: 'submit',
           },
         }}
       >
         <TextInput
-          label="Kode Barang"
-          placeholder="Masukkan kode barang"
-          {...form.getInputProps('code')}
+          label="Nama Cabang"
+          placeholder="Masukkan nama cabang"
+          {...form.getInputProps('full_name')}
           required
           styles={{
-            wrapper: { marginBottom: 0 },
+            wrapper: { marginBottom: 16 },
             label: { marginBottom: 8 },
-            input: { padding: '0 16px 0 56px', height: 48 },
+            input: { height: 48 },
           }}
         />
 
         <TextInput
-          label="Nama Barang"
-          placeholder="Masukkan nama barang"
-          {...form.getInputProps('name')}
+          label="Nomor Telepon"
+          placeholder="Masukkan nomor telepon"
+          {...form.getInputProps('phone_number')}
           required
-          mt="md"
           styles={{
-            wrapper: { marginBottom: 0 },
+            wrapper: { marginBottom: 16 },
             label: { marginBottom: 8 },
-            input: { padding: '0 16px 0 56px', height: 48 },
+            input: { height: 48 },
           }}
         />
 
-        <NumberInput
-          label="Kuantitas"
-          placeholder="Masukkan kuantitas barang"
-          {...form.getInputProps('quantity')}
+        <TextInput
+          label="Email"
+          placeholder="Masukkan email cabang"
+          {...form.getInputProps('email')}
           required
-          mt="md"
-          min={1}
           styles={{
-            wrapper: { marginBottom: 0 },
+            wrapper: { marginBottom: 16 },
             label: { marginBottom: 8 },
-            input: { padding: '0 16px 0 56px', height: 48 },
+            input: { height: 48 },
           }}
         />
 
-        <Select
-          label="Satuan"
-          placeholder="Pilih satuan"
-          data={[
-            { value: 'pcs', label: 'pcs' },
-            { value: 'kg', label: 'kg' },
-            { value: 'ltr', label: 'ltr' },
-          ]}
-          {...form.getInputProps('unit')}
-          required
-          mt="md"
+        <TextInput
+          label="Kata Sandi"
+          placeholder="Kosongkan jika tidak ingin mengubah"
+          type="password"
+          {...form.getInputProps('password')}
           styles={{
-            wrapper: { marginBottom: 0 },
+            wrapper: { marginBottom: 16 },
             label: { marginBottom: 8 },
-            input: { padding: '0 16px 0 56px', height: 48 },
+            input: { height: 48 },
           }}
         />
       </AuthenticatedLayout>
@@ -116,4 +107,4 @@ const Edit = (props) => {
   );
 };
 
-export default Edit;
+export default EditBranch;

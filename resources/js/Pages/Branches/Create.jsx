@@ -1,26 +1,29 @@
 import { AuthenticatedLayout } from '@/Layouts/AuthenticatedLayout.jsx';
 import { router } from '@inertiajs/react';
-import { NumberInput, Select, TextInput } from '@mantine/core';
+import { TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 
 const Create = (props) => {
   const form = useForm({
     initialValues: {
-      code: '',
-      name: '',
-      quantity: 0,
-      unit: '',
+      full_name: '',
+      phone_number: '',
+      email: '',
+      password: '',
     },
     validate: {
-      code: (value) => (value.trim() ? null : 'Kode barang harus diisi'),
-      name: (value) => (value.trim() ? null : 'Nama barang harus diisi'),
-      quantity: (value) => (value > 0 ? null : 'Kuantitas harus lebih dari 0'),
-      unit: (value) => (value ? null : 'Satuan harus dipilih'),
+      full_name: (value) => (value.trim() ? null : 'Nama cabang harus diisi'),
+      phone_number: (value) =>
+        value.trim() ? null : 'Nomor telepon cabang harus diisi',
+      email: (value) =>
+        /^\S+@\S+\.\S+$/.test(value) ? null : 'Email tidak valid',
+      password: (value) =>
+        value.length >= 8 ? null : 'Kata sandi minimal 8 karakter',
     },
   });
 
   const handleSubmit = (values) => {
-    router.post(route('items.store'), values, {
+    router.post(route('branches.store'), values, {
       onSuccess: () => {
         form.reset();
       },
@@ -40,75 +43,63 @@ const Create = (props) => {
         pageHeadingsProps={{
           title: props.page_title,
           breadcrumbs: [
-            { title: 'Barang', route: 'items.index' },
-            { title: 'Tambah', route: 'items.create' },
+            { title: 'Cabang', route: 'branches.index' },
+            { title: 'Tambah', route: 'branches.create' },
           ],
           actionButtonProps: {
-            isVisible: true,
-            type: 'submit',
+            isVisible: props.auth.user.role === 'Admin',
             label: 'Simpan',
-            onClick: () => router.get(route('items.store')),
+            type: 'submit',
+            onClick: () => router.get(route('branches.create')),
           },
         }}
       >
         <TextInput
-          label="Kode Barang"
-          placeholder="Masukkan kode barang"
-          {...form.getInputProps('code')}
+          label="Nama Cabang"
+          placeholder="Masukkan nama cabang"
+          {...form.getInputProps('full_name')}
           required
           styles={{
-            section: { width: 24, margin: '0 16px' },
-            wrapper: { marginBottom: 0 },
+            wrapper: { marginBottom: 16 },
             label: { marginBottom: 8 },
-            input: { padding: '0 16px 0 56px', height: 48 },
+            input: { height: 48 },
           }}
         />
 
         <TextInput
-          label="Nama Barang"
-          placeholder="Masukkan nama barang"
-          {...form.getInputProps('name')}
+          label="Nomor Telepon"
+          placeholder="Masukkan nomor telepon"
+          {...form.getInputProps('phone_number')}
           required
-          mt="md"
           styles={{
-            section: { width: 24, margin: '0 16px' },
-            wrapper: { marginBottom: 0 },
+            wrapper: { marginBottom: 16 },
             label: { marginBottom: 8 },
-            input: { padding: '0 16px 0 56px', height: 48 },
+            input: { height: 48 },
           }}
         />
 
-        <NumberInput
-          label="Kuantitas"
-          placeholder="Masukkan kuantitas barang"
-          {...form.getInputProps('quantity')}
+        <TextInput
+          label="Email"
+          placeholder="Masukkan email cabang"
+          {...form.getInputProps('email')}
           required
-          mt="md"
-          min={1}
           styles={{
-            section: { width: 24, margin: '0 16px' },
-            wrapper: { marginBottom: 0 },
+            wrapper: { marginBottom: 16 },
             label: { marginBottom: 8 },
-            input: { padding: '0 16px 0 56px', height: 48 },
+            input: { height: 48 },
           }}
         />
 
-        <Select
-          label="Satuan"
-          placeholder="Pilih satuan"
-          data={[
-            { value: 'pcs', label: 'pcs' },
-            { value: 'kg', label: 'kg' },
-            { value: 'ltr', label: 'ltr' },
-          ]}
-          {...form.getInputProps('unit')}
+        <TextInput
+          label="Kata Sandi"
+          placeholder="Masukkan kata sandi"
+          type="password"
+          {...form.getInputProps('password')}
           required
-          mt="md"
           styles={{
-            section: { width: 24, margin: '0 16px' },
-            wrapper: { marginBottom: 0 },
+            wrapper: { marginBottom: 16 },
             label: { marginBottom: 8 },
-            input: { padding: '0 16px 0 56px', height: 48 },
+            input: { height: 48 },
           }}
         />
       </AuthenticatedLayout>

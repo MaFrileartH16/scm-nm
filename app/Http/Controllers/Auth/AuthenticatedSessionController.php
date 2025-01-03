@@ -59,7 +59,7 @@ class AuthenticatedSessionController extends Controller
           'message' => 'Anda telah keluar dari akun.',
         ]);
     } catch (Exception $e) {
-      return redirect()->route('dashboard')
+      return redirect()->route('items.index')
         ->with('notification', [
           'status' => 'error',
           'title' => 'Logout Gagal',

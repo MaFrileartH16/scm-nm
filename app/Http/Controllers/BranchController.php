@@ -20,6 +20,7 @@ class BranchController extends Controller
     return Inertia::render('Branches/Index', [
       'page_title' => 'Daftar Cabang',
       'branches' => $branches,
+      'notification' => session()->pull('notification'),
     ]);
   }
 
@@ -35,7 +36,7 @@ class BranchController extends Controller
       'password' => 'required|string|min:8',
     ]);
 
-    User::create(array_merge($validated, ['role' => 'Branch']));
+    User::create(array_merge($validated, ['role' => 'Cabang']));
 
     return redirect()->route('branches.index')
       ->with('notification', [

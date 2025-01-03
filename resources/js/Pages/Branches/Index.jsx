@@ -6,7 +6,7 @@ import { MantineReactTable, useMantineReactTable } from 'mantine-react-table';
 
 const Index = (props) => {
   console.log(props);
-  const data = props.branches || []; // Safeguard to handle missing data
+  const data = props.branches || [];
 
   const columns = [
     { accessorKey: 'full_name', header: 'Nama Lengkap' },
@@ -22,7 +22,7 @@ const Index = (props) => {
             variant="subtle"
             color="yellow"
             onClick={() =>
-              router.get(route('users.edit', { id: row.original.id }))
+              router.get(route('branches.edit', { id: row.original.id }))
             }
           >
             <IconEdit />
@@ -32,7 +32,7 @@ const Index = (props) => {
             variant="subtle"
             color="red"
             onClick={() =>
-              router.delete(route('users.destroy', { id: row.original.id }))
+              router.delete(route('branches.destroy', { id: row.original.id }))
             }
           >
             <IconTrash />
@@ -60,8 +60,8 @@ const Index = (props) => {
         title: props.page_title,
         actionButtonProps: {
           isVisible: props.auth.user.role === 'Admin',
-          label: 'Tambah Pengguna',
-          onClick: () => router.get(route('users.create')),
+          label: 'Tambah',
+          onClick: () => router.get(route('branches.create')),
         },
       }}
     >

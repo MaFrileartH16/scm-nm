@@ -8,11 +8,14 @@ use App\Models\OrderStatusProof;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class OrderController extends Controller
 {
+
+
   public function index(Request $request): Response
   {
     $user = Auth::user();
@@ -47,7 +50,9 @@ class OrderController extends Controller
               'quantity' => $orderItem->quantity,
             ];
           }),
-          'proof_image_path' => $latestProof?->proof_image_path,
+          'proof_image_path' => $latestProof && $latestProof->proof_image_path
+            ? Storage::url($latestProof->proof_image_path)
+            : null, // Generate full URL for the proof image
           'created_at' => $order->created_at,
           'updated_at' => $order->updated_at,
         ];

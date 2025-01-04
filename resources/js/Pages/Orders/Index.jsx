@@ -82,7 +82,7 @@ const Orders = (props) => {
       <Table.Td>
         {order.proof_image_path ? (
           <Image
-            src={route('storage', { path: order.proof_image_path })}
+            src={order.proof_image_path} // Directly use the proof_image_path provided by the backend
             alt="Bukti Foto"
             width={100}
             height={100}

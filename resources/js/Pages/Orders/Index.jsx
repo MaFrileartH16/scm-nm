@@ -215,11 +215,12 @@ const Orders = (props) => {
     >
       <Group justify="space-between">
         <Title>Daftar Pesanan</Title>
-        {userRole !== 'Kurir' && (
-          <Button onClick={() => router.get(route('warehouse_items.index'))}>
-            Tambah Pesanan
-          </Button>
-        )}
+        {userRole !== 'Kurir' ||
+          (userRole !== 'Admin' && (
+            <Button onClick={() => router.get(route('warehouse_items.index'))}>
+              Tambah Pesanan
+            </Button>
+          ))}
       </Group>
 
       <Card shadow="sm" p="lg" radius="md" withBorder>

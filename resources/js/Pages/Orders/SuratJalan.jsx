@@ -184,7 +184,7 @@ const Orders = (props) => {
       }}
     >
       <Group justify="space-between">
-        <Title>Daftar Surat Jalan</Title>
+        <Title>Print Surat Jalan</Title>
         {userRole !== 'Kurir' && (
           <Button onClick={() => router.get(route('warehouse_items.index'))}>
             Tambah Pesanan

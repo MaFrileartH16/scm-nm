@@ -1,44 +1,50 @@
 import { AuthenticatedLayout } from '@/Layouts/AuthenticatedLayout.jsx';
 import { router } from '@inertiajs/react';
-import { ActionIcon, Button, Card, Group, Table, Title } from '@mantine/core';
-import { IconEdit, IconTrash } from '@tabler/icons-react';
+import { Accordion, Button, Card, Group, Table, Title } from '@mantine/core';
 
 const Orders = (props) => {
-  console.log(props, 'permintaan');
-  const orders = props.orders || []; // Use 'orders' instead of 'branches'
+  console.log(props);
+  const orders = props.orders || [];
 
   const rows = orders.map((order, index) => (
-    <Table.Tr key={order.id} style={{ height: '48px' }}>
+    <Table.Tr key={order.id || `order-${index}`}>
       <Table.Td>{index + 1}</Table.Td>
-      <Table.Td>{order.code}</Table.Td> {/* Display order code */}
-      <Table.Td>{order.status}</Table.Td> {/* Display order status */}
-      <Table.Td>{order.created_at}</Table.Td>{' '}
-      {/* Display order creation date */}
       <Table.Td>
-        <div style={{ display: 'flex', gap: '8px' }}>
-          {/* Action buttons for edit and delete */}
-          <ActionIcon
-            size={48}
-            variant="subtle"
-            color="yellow"
-            onClick={
-              () => router.get(route('orders.edit', order)) // Edit order route
-            }
-          >
-            <IconEdit />
-          </ActionIcon>
-          <ActionIcon
-            size={48}
-            variant="subtle"
-            color="red"
-            onClick={
-              () => router.delete(route('orders.destroy', order)) // Delete order route
-            }
-          >
-            <IconTrash />
-          </ActionIcon>
-        </div>
+        <Accordion chevronPosition="right" variant="separated">
+          <Accordion.Item value={order.id?.toString() || `order-${index}`}>
+            <Accordion.Control>
+              <strong>{order.code}</strong>
+            </Accordion.Control>
+            <Accordion.Panel>
+              <Title order={6}>Order Items</Title>
+              <Table striped highlightOnHover withColumnBorders>
+                <Table.Thead>
+                  <Table.Tr>
+                    <Table.Th>No</Table.Th>
+                    <Table.Th>Kode Item</Table.Th>
+                    <Table.Th>Nama Item</Table.Th>
+                    <Table.Th>Unit</Table.Th>
+                    <Table.Th>Quantity</Table.Th>
+                  </Table.Tr>
+                </Table.Thead>
+                <Table.Tbody>
+                  {order.items.map((item, itemIndex) => (
+                    <Table.Tr key={item.id || `item-${itemIndex}`}>
+                      <Table.Td>{itemIndex + 1}</Table.Td>
+                      <Table.Td>{item.code}</Table.Td>
+                      <Table.Td>{item.name}</Table.Td>
+                      <Table.Td>{item.unit}</Table.Td>
+                      <Table.Td>{item.quantity}</Table.Td>
+                    </Table.Tr>
+                  ))}
+                </Table.Tbody>
+              </Table>
+            </Accordion.Panel>
+          </Accordion.Item>
+        </Accordion>
       </Table.Td>
+      <Table.Td>{order.status}</Table.Td>
+      <Table.Td>{order.created_at}</Table.Td>
     </Table.Tr>
   ));
 
@@ -54,35 +60,31 @@ const Orders = (props) => {
     >
       <Group justify="space-between">
         <Title>Daftar Pesanan</Title>
-
         <Button onClick={() => router.get(route('orders.create'))}>
           Tambah Pesanan
         </Button>
       </Group>
 
       <Card shadow="sm" p="lg" radius="md" withBorder>
-        <div style={{ overflow: 'hidden', borderRadius: '16px' }}>
-          <Table
-            striped
-            highlightOnHover
-            withTableBorder
-            withColumnBorders
-            horizontalSpacing={16}
-            verticalSpacing={16}
-            tabularNums
-          >
-            <Table.Thead style={{ height: '48px' }}>
-              <Table.Tr>
-                {['No', 'Kode Pesanan', 'Status', 'Tanggal Dibuat', 'Aksi'].map(
-                  (field) => (
-                    <Table.Th key={field}>{field}</Table.Th>
-                  ),
-                )}
-              </Table.Tr>
-            </Table.Thead>
-            <Table.Tbody>{rows}</Table.Tbody>
-          </Table>
-        </div>
+        <Table
+          striped
+          highlightOnHover
+          withTableBorder
+          withColumnBorders
+          horizontalSpacing={16}
+          verticalSpacing={16}
+          tabularNums
+        >
+          <Table.Thead>
+            <Table.Tr>
+              <Table.Th>No</Table.Th>
+              <Table.Th>Kode Pesanan</Table.Th>
+              <Table.Th>Status</Table.Th>
+              <Table.Th>Tanggal Dibuat</Table.Th>
+            </Table.Tr>
+          </Table.Thead>
+          <Table.Tbody>{rows}</Table.Tbody>
+        </Table>
       </Card>
     </AuthenticatedLayout>
   );

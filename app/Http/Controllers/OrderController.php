@@ -41,6 +41,13 @@ class OrderController extends Controller
           'order_id' => $order->id,
           'code' => $order->code,
           'status' => $order->status,
+          'branch' => $order->branch ? [
+            'id' => $order->branch->id,
+            'name' => $order->branch->name,
+            'email' => $order->branch->email,
+            'phone_number' => $order->branch->phone_number,
+            'address' => $order->branch->address,
+          ] : null, // Include branch data if available
           'items' => $order->items->map(function ($orderItem) {
             return [
               'id' => $orderItem->item->id,

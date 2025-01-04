@@ -73,6 +73,23 @@ const Orders = (props) => {
                   ))}
                 </Table.Tbody>
               </Table>
+              {userRole === 'Admin' || userRole === 'Kurir' ? (
+                <div style={{ marginTop: '16px' }}>
+                  <Title order={6}>Branch Information</Title>
+                  <p>
+                    <strong>Name:</strong> {order.branch?.name || '-'}
+                  </p>
+                  <p>
+                    <strong>Email:</strong> {order.branch?.email || '-'}
+                  </p>
+                  <p>
+                    <strong>Phone:</strong> {order.branch?.phone_number || '-'}
+                  </p>
+                  <p>
+                    <strong>Address:</strong> {order.branch?.address || '-'}
+                  </p>
+                </div>
+              ) : null}
             </Accordion.Panel>
           </Accordion.Item>
         </Accordion>
@@ -199,7 +216,7 @@ const Orders = (props) => {
       <Group justify="space-between">
         <Title>Daftar Pesanan</Title>
         {userRole !== 'Kurir' && (
-          <Button onClick={() => router.get(route('orders.create'))}>
+          <Button onClick={() => router.get(route('warehouse_items.index'))}>
             Tambah Pesanan
           </Button>
         )}

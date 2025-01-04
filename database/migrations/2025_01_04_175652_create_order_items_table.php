@@ -11,8 +11,15 @@ return new class extends Migration {
   public function up(): void
   {
     Schema::create('order_items', function (Blueprint $table) {
-      $table->foreignUlid("order_id")->constrained();
-      $table->foreignUlid("item_id")->constrained();
+      $table->foreignUlid('order_id')
+        ->constrained()
+        ->onUpdate('cascade') // Cascade on update
+        ->onDelete('cascade'); // Cascade on delete
+
+      $table->foreignUlid('item_id')
+        ->constrained()
+        ->onUpdate('cascade') // Cascade on update
+        ->onDelete('cascade'); // Cascade on delete
       $table->integer('quantity');
       $table->timestamps();
     });

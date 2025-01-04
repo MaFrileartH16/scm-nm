@@ -20,9 +20,12 @@ Route::middleware('auth')->group(function () {
   Route::resource('branches', BranchController::class);
   Route::get('warehouse_items', [BranchController::class, 'warehouse_items_index'])->name('warehouse_items.index');
   Route::get('requests', [OrderController::class, 'index'])->name('requests');
+  Route::get('delivieries', [OrderController::class, 'index'])->name('deliveries.index');
 
   Route::resource('couriers', CourierController::class);
   Route::resource('orders', OrderController::class);
+  Route::post('/orders/{order}/status', [OrderController::class, 'changeStatus'])->name('orders.changeStatus');
+
 });
 
 require __DIR__ . '/auth.php';

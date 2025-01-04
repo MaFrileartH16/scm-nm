@@ -30,9 +30,10 @@ class AuthenticatedSessionController extends Controller
 
       // Check the role of the authenticated user
       $user = Auth::user();
+
       // Redirect based on the role
       if ($user->role === 'Kurir') {
-        return redirect("/shipments") // Route for "pengiriman"
+        return redirect()->route('deliveries.index') // Route for "pengiriman"
         ->with('notification', [
           'status' => 'success',
           'title' => 'Login Berhasil',

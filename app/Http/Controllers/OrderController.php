@@ -6,7 +6,6 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\OrderStatusProof;
 use Barryvdh\DomPDF\Facade\Pdf;
-use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -14,27 +13,32 @@ use Inertia\Response;
 
 class OrderController extends Controller
 {
-  /**
-   * Display a listing of the orders.
-   */
   public function index(Request $request): Response
   {
-    try {
-      $user = Auth::user();
-      $userRole = $user->role;
-      $userId = $user->id;
+    $user = Auth::user();
+    $userRole = $user->role;
+    $userId = $user->id;
 
-      $orders = Order::query()
-        ->when($userRole === 'Admin', function ($query) {
-          $query->with(['branch', 'items.item']);
-        })
-        ->when($userRole === 'Cabang', function ($query) use ($userId) {
-          $query->where('branch_id', $userId)->with('items');
-        })
-        ->latest()
-        ->get()
-        ->map(function ($order) {
-          $formattedItems = $order->items->map(function ($orderItem) {
+    $orders = Order::query()
+      ->when($userRole === 'Cabang', function ($query) use ($userId) {
+        // Filter orders by branch_id for Cabang role
+        $query->where('branch_id', $userId)->with('items');
+      })
+      ->when($userRole === 'Admin' || $userRole === 'Kurir', function ($query) {
+        // For Admin and Kurir roles, include all orders
+        $query->with(['items.item', 'statusProofs', 'branch']);
+      })
+      ->latest()
+      ->get()
+      ->map(function ($order) {
+        // Get the latest status proof entry manually
+        $latestProof = $order->statusProofs()->get()->last();
+
+        return [
+          'order_id' => $order->id,
+          'code' => $order->code,
+          'status' => $order->status,
+          'items' => $order->items->map(function ($orderItem) {
             return [
               'id' => $orderItem->item->id,
               'code' => $orderItem->item->code,
@@ -42,176 +46,123 @@ class OrderController extends Controller
               'unit' => $orderItem->item->unit,
               'quantity' => $orderItem->quantity,
             ];
-          });
+          }),
+          'proof_image_path' => $latestProof?->proof_image_path,
+          'created_at' => $order->created_at,
+          'updated_at' => $order->updated_at,
+        ];
+      });
 
-          return [
-            'order_id' => $order->id,
-            'code' => $order->code,
-            'status' => $order->status,
-            'items' => $formattedItems,
-            'created_at' => $order->created_at,
-            'updated_at' => $order->updated_at,
-          ];
-        });
-
-      return Inertia::render('Orders/Index', [
-        'page_title' => 'Daftar Pesanan',
-        'orders' => $orders,
-      ]);
-    } catch (Exception $e) {
-      return redirect()->back()->with('notification', [
-        'status' => 'error',
-        'title' => 'Gagal Memuat Pesanan',
-        'message' => 'Terjadi kesalahan saat memuat daftar pesanan.',
-      ]);
-    }
+    return Inertia::render('Orders/Index', [
+      'page_title' => 'Daftar Pesanan',
+      'orders' => $orders,
+    ]);
   }
 
-  /**
-   * Store a newly created order.
-   */
+
+  public function changeStatus(Request $request, Order $order)
+  {
+    $order->update(['status' => $request->status]);
+
+    $proofData = [
+      'order_id' => $order->id,
+      'status' => $request->status,
+    ];
+
+    if ($request->hasFile('proof_image')) {
+      $path = $request->file('proof_image')->store('proofs', 'public');
+      $proofData['proof_image_path'] = $path;
+    }
+
+    // Insert directly into the `order_status_proofs` table without timestamps or id.
+    OrderStatusProof::create($proofData);
+
+    return redirect()->route('orders.index')->with('notification', [
+      'status' => 'success',
+      'title' => 'Status Updated',
+      'message' => 'The order status has been successfully updated.',
+    ]);
+  }
+
   public function store(Request $request)
   {
-    try {
-      $order = Order::create([
-        'code' => strtoupper(uniqid('ORD-')),
-        'branch_id' => Auth::id(),
-        'status' => 'Belum Disetujui',
-      ]);
+    $order = Order::create([
+      'code' => strtoupper(uniqid('ORD-')),
+      'branch_id' => Auth::id(),
+      'status' => 'Belum Disetujui',
+    ]);
 
-      foreach ($request->items as $item) {
-        OrderItem::create([
-          'order_id' => $order->id,
-          'item_id' => $item['itemId'],
-          'quantity' => $item['quantity'],
-        ]);
-      }
-
-      OrderStatusProof::create([
+    foreach ($request->items as $item) {
+      OrderItem::create([
         'order_id' => $order->id,
-        'status' => 'Belum Disetujui',
-      ]);
-
-      $order->load('items.item');
-
-      $pdfData = [
-        'order' => $order,
-        'items' => $order->items->map(function ($orderItem) {
-          return [
-            'code' => $orderItem->item->code,
-            'name' => $orderItem->item->name,
-            'unit' => $orderItem->item->unit,
-            'quantity' => $orderItem->quantity,
-          ];
-        }),
-      ];
-
-      $directoryPath = storage_path('app/public/orders');
-      if (!is_dir($directoryPath)) {
-        mkdir($directoryPath, 0755, true);
-      }
-
-      $fileName = "order_{$order->code}.pdf";
-      $filePath = $directoryPath . "/{$fileName}";
-
-      $pdf = Pdf::loadView('pdf.order', $pdfData);
-      $pdf->save($filePath);
-
-      return redirect()->route('orders.index')->with('notification', [
-        'status' => 'success',
-        'title' => 'Pesanan Berhasil Dibuat',
-        'message' => 'Pesanan baru telah berhasil dibuat.',
-        'pdf_url' => asset("storage/orders/{$fileName}"),
-      ]);
-    } catch (Exception $e) {
-      return redirect()->back()->with('notification', [
-        'status' => 'error',
-        'title' => 'Gagal Membuat Pesanan',
-        'message' => 'Terjadi kesalahan saat membuat pesanan baru.',
+        'item_id' => $item['itemId'],
+        'quantity' => $item['quantity'],
       ]);
     }
+
+    OrderStatusProof::create([
+      'order_id' => $order->id,
+      'status' => 'Belum Disetujui',
+    ]);
+
+    $order->load('items.item');
+
+    $pdfData = [
+      'order' => $order,
+      'items' => $order->items->map(function ($orderItem) {
+        return [
+          'code' => $orderItem->item->code,
+          'name' => $orderItem->item->name,
+          'unit' => $orderItem->item->unit,
+          'quantity' => $orderItem->quantity,
+        ];
+      }),
+    ];
+
+    $directoryPath = storage_path('app/public/orders');
+    if (!is_dir($directoryPath)) {
+      mkdir($directoryPath, 0755, true);
+    }
+
+    $fileName = "order_{$order->code}.pdf";
+    $filePath = $directoryPath . "/{$fileName}";
+
+    $pdf = Pdf::loadView('pdf.order', $pdfData);
+    $pdf->save($filePath);
+
+    return redirect()->route('orders.index')->with('notification', [
+      'status' => 'success',
+      'title' => 'Pesanan Berhasil Dibuat',
+      'message' => 'Pesanan baru telah berhasil dibuat.',
+      'pdf_url' => asset("storage/orders/{$fileName}"),
+    ]);
   }
 
-  /**
-   * Show the form for creating a new order.
-   */
   public function create(): Response
   {
-    try {
-      return Inertia::render('Orders/Create', [
-        'page_title' => 'Buat Pesanan',
-      ]);
-    } catch (Exception $e) {
-      return redirect()->back()->with('notification', [
-        'status' => 'error',
-        'title' => 'Gagal Memuat Halaman',
-        'message' => 'Terjadi kesalahan saat memuat halaman pembuatan pesanan.',
-      ]);
-    }
+    return Inertia::render('Orders/Create', [
+      'page_title' => 'Buat Pesanan',
+    ]);
   }
 
-  /**
-   * Display the specified order.
-   */
-  public function show(Order $order): Response
-  {
-    try {
-      $order->load('items.item');
-
-      return Inertia::render('Orders/Show', [
-        'page_title' => 'Detail Pesanan',
-        'order' => $order,
-      ]);
-    } catch (Exception $e) {
-      return redirect()->back()->with('notification', [
-        'status' => 'error',
-        'title' => 'Gagal Memuat Pesanan',
-        'message' => 'Terjadi kesalahan saat memuat detail pesanan.',
-      ]);
-    }
-  }
-
-  /**
-   * Update the status of the specified order.
-   */
-  public function update(Request $request, Order $order)
-  {
-    try {
-      $order->update(['status' => $request->status]);
-
-      return redirect()->route('orders.index')->with('notification', [
-        'status' => 'success',
-        'title' => 'Pesanan Berhasil Diperbarui',
-        'message' => 'Status pesanan telah berhasil diperbarui.',
-      ]);
-    } catch (Exception $e) {
-      return redirect()->back()->with('notification', [
-        'status' => 'error',
-        'title' => 'Gagal Memperbarui Pesanan',
-        'message' => 'Terjadi kesalahan saat memperbarui status pesanan.',
-      ]);
-    }
-  }
-
-  /**
-   * Remove the specified order from storage.
-   */
   public function destroy(Order $order)
   {
-    try {
-      $order->delete();
+    $order->delete();
 
-      return redirect()->route('orders.index')->with('notification', [
-        'status' => 'success',
-        'title' => 'Pesanan Berhasil Dihapus',
-        'message' => 'Pesanan telah berhasil dihapus.',
-      ]);
-    } catch (Exception $e) {
-      return redirect()->back()->with('notification', [
-        'status' => 'error',
-        'title' => 'Gagal Menghapus Pesanan',
-        'message' => 'Terjadi kesalahan saat menghapus pesanan.',
-      ]);
-    }
+    return redirect()->route('orders.index')->with('notification', [
+      'status' => 'success',
+      'title' => 'Pesanan Berhasil Dihapus',
+      'message' => 'Pesanan telah berhasil dihapus.',
+    ]);
+  }
+
+  public function show(Order $order): Response
+  {
+    $order->load('items.item');
+
+    return Inertia::render('Orders/Show', [
+      'page_title' => 'Detail Pesanan',
+      'order' => $order,
+    ]);
   }
 }

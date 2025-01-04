@@ -80,8 +80,16 @@ export const Header = (props) => {
             icon: <IconDatabase />,
             type: 'accordion',
             submenu: [
-              { label: 'Permintaan', icon: <IconDashboard /> },
-              { label: 'Update Status', icon: <IconDashboard /> },
+              {
+                label: 'Permintaan',
+                icon: <IconDashboard />,
+                route: 'orders.index',
+              },
+              {
+                label: 'Update Status',
+                icon: <IconDashboard />,
+                route: 'deliveries',
+              },
             ],
           },
         ];

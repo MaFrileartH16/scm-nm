@@ -4,7 +4,6 @@ namespace Database\Factories;
 
 use App\Models\Item;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Str;
 
 /**
  * @extends Factory<Item>
@@ -19,10 +18,9 @@ class ItemFactory extends Factory
   public function definition(): array
   {
     return [
-      'code' => strtoupper(Str::random(8)),
-      'name' => $this->faker->word,
-      'quantity' => $this->faker->numberBetween(1, 100),
-      'unit' => $this->faker->randomElement(['pcs', 'kg', 'ltr']),
+      'code' => strtoupper($this->faker->unique()->bothify('ITEM-####')), // Generate unique code in the format ITEM-####
+      'name' => $this->faker->sentence(3, false), // Generate a 3-word name without ending punctuation
+      'unit' => $this->faker->randomElement(['pcs', 'kg', 'ltr', 'box', 'set']), // Random unit from predefined options
     ];
   }
 }

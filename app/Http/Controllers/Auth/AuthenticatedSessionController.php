@@ -28,7 +28,20 @@ class AuthenticatedSessionController extends Controller
 
       $request->session()->regenerate();
 
-      return redirect()->intended(route('items.index'))
+      // Check the role of the authenticated user
+      $user = Auth::user();
+      // Redirect based on the role
+      if ($user->role === 'Kurir') {
+        return redirect("/shipments") // Route for "pengiriman"
+        ->with('notification', [
+          'status' => 'success',
+          'title' => 'Login Berhasil',
+          'message' => 'Selamat datang kembali, Kurir.',
+        ]);
+      }
+
+      // Default redirection for other roles
+      return redirect()->route('items.index')
         ->with('notification', [
           'status' => 'success',
           'title' => 'Login Berhasil',
@@ -43,6 +56,7 @@ class AuthenticatedSessionController extends Controller
         ]);
     }
   }
+
 
   public function destroy(Request $request): RedirectResponse
   {

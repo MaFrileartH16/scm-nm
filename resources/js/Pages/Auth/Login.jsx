@@ -1,5 +1,5 @@
 import { GuestLayout } from '@/Layouts/GuestLayout.jsx';
-import { useForm } from '@inertiajs/react';
+import { router } from '@inertiajs/react';
 import {
   ActionIcon,
   Button,
@@ -11,6 +11,7 @@ import {
   Title,
   Tooltip,
 } from '@mantine/core';
+import { useForm } from '@mantine/form';
 import {
   IconEye,
   IconEyeOff,
@@ -21,18 +22,25 @@ import { useState } from 'react';
 
 const Login = (props) => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+
   const form = useForm({
-    email: '',
-    password: '',
+    initialValues: {
+      email: '',
+      password: '',
+    },
   });
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    form.post('login');
+  const handleSubmit = (values) => {
+    const normalizedValues = {
+      ...values,
+      email: values.email.toLowerCase(),
+    };
+
+    router.post(route('login'), normalizedValues);
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={form.onSubmit(handleSubmit)}>
       <GuestLayout title={props.page_title} notification={props.notification}>
         <Flex flex={1}>
           <Container
@@ -48,9 +56,10 @@ const Login = (props) => {
             <Image
               h={48}
               w={48}
-              mb={16}
               src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Honda_Logo.svg/1120px-Honda_Logo.svg.png"
             />
+
+            <Space h={16} />
 
             <Title align="center">Masuk Akun</Title>
 
@@ -61,8 +70,7 @@ const Login = (props) => {
               autoFocus
               label="Alamat Surel"
               placeholder="email@ahass.id"
-              value={form.data.email}
-              onChange={(e) => form.setData('email', e.target.value)}
+              {...form.getInputProps('email')}
               required
               leftSection={<IconMail />}
               styles={{
@@ -80,8 +88,7 @@ const Login = (props) => {
               type={isPasswordVisible ? 'text' : 'password'}
               label="Kata Sandi"
               placeholder="********"
-              value={form.data.password}
-              onChange={(e) => form.setData('password', e.target.value)}
+              {...form.getInputProps('password')}
               required
               leftSection={<IconPassword />}
               rightSection={
@@ -120,7 +127,7 @@ const Login = (props) => {
 
             <Space h={32} />
 
-            <Button h={48} type="submit" fullWidth loading={form.processing}>
+            <Button h={48} type="submit" fullWidth>
               Masuk
             </Button>
           </Container>

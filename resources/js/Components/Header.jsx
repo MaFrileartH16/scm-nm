@@ -55,7 +55,11 @@ export const Header = (props) => {
             icon: <IconDatabase />,
             type: 'accordion',
             submenu: [
-              { label: 'Permintaan', icon: <IconDashboard /> },
+              {
+                label: 'Permintaan',
+                icon: <IconDashboard />,
+                route: 'orders.index',
+              },
               { label: 'Print Surat Jalan', icon: <IconDashboard /> },
               { label: 'Pengiriman', icon: <IconDashboard /> },
             ],
@@ -79,21 +83,32 @@ export const Header = (props) => {
             label: 'Master',
             icon: <IconDatabase />,
             type: 'accordion',
-            submenu: [{ label: 'Barang', icon: <IconDashboard /> }],
+            submenu: [
+              {
+                label: 'Barang',
+                icon: <IconDashboard />,
+                route: 'items.index',
+              },
+            ],
           },
           {
             label: 'Laporan',
             icon: <IconDatabase />,
             type: 'accordion',
             submenu: [
-              { label: 'Permintaan', icon: <IconDashboard /> },
+              {
+                label: 'Permintaan',
+                icon: <IconDashboard />,
+                route: 'orders.index',
+              },
               {
                 label: 'Status Kurir',
                 icon: <IconDashboard />,
               },
               {
-                label: 'Stok',
+                label: 'Stok Warehouse',
                 icon: <IconDashboard />,
+                route: 'warehouse_items.index',
               },
             ],
           },
@@ -208,7 +223,7 @@ export const Header = (props) => {
             <Menu.Target>
               <Button variant="subtle" w={48} h={48} p={4}>
                 <Avatar radius="md" color="red">
-                  {props.user.full_name[0]}
+                  {props.user.name[0]}
                 </Avatar>
               </Button>
             </Menu.Target>

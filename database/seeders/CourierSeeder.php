@@ -5,7 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
-class DriverSeeder extends Seeder
+class CourierSeeder extends Seeder
 {
     /**
      * Run the database seeds.

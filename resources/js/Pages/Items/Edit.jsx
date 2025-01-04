@@ -1,34 +1,33 @@
 import { AuthenticatedLayout } from '@/Layouts/AuthenticatedLayout.jsx';
-import { router } from '@inertiajs/react';
-import { NumberInput, Select, TextInput } from '@mantine/core';
-import { useForm } from '@mantine/form';
+import { useForm } from '@inertiajs/react';
+import {
+  Button,
+  Group,
+  NumberInput,
+  Select,
+  TextInput,
+  Title,
+} from '@mantine/core';
 
 const Edit = (props) => {
-  const form = useForm({
-    initialValues: {
-      code: props.item?.code || '',
-      name: props.item?.name || '',
-      quantity: props.item?.quantity || 0,
-      unit: props.item?.unit || '',
-    },
-    validate: {
-      code: (value) => (value.trim() ? null : 'Kode barang harus diisi'),
-      name: (value) => (value.trim() ? null : 'Nama barang harus diisi'),
-      quantity: (value) => (value > 0 ? null : 'Kuantitas harus lebih dari 0'),
-      unit: (value) => (value ? null : 'Satuan harus dipilih'),
-    },
+  const { data, setData, put, processing, errors } = useForm({
+    code: props.item.code,
+    name: props.item.name,
+    quantity: props.item.quantity,
+    unit: props.item.unit,
   });
 
-  const handleSubmit = (values) => {
-    router.put(route('items.update', { id: props.item.id }), values, {
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    put(route('items.update', { id: props.item.id }), {
       onSuccess: () => {
-        router.get(route('items.index'));
+        console.log('Item updated successfully');
       },
     });
   };
 
   return (
-    <form onSubmit={form.onSubmit(handleSubmit)}>
+    <form onSubmit={handleSubmit}>
       <AuthenticatedLayout
         appLayoutProps={{
           title: props.page_title,
@@ -37,80 +36,60 @@ const Edit = (props) => {
         headerProps={{
           user: props.auth.user,
         }}
-        pageHeadingsProps={{
-          title: props.page_title,
-          breadcrumbs: [
-            { title: 'Barang', route: 'items.index' },
-            {
-              title: 'Ubah',
-              route: 'items.edit',
-              params: { id: props.item.id },
-            },
-          ],
-          actionButtonProps: {
-            isVisible: true,
-            type: 'submit',
-            label: 'Simpan',
-            onClick: () => router.get(route('items.update')),
-          },
-        }}
       >
+        <Title mb="md">Ubah Barang</Title>
+
         <TextInput
           label="Kode Barang"
           placeholder="Masukkan kode barang"
-          {...form.getInputProps('code')}
+          value={data.code}
+          onChange={(e) => setData('code', e.target.value)}
+          error={errors.code}
           required
-          styles={{
-            wrapper: { marginBottom: 0 },
-            label: { marginBottom: 8 },
-            input: { padding: '0 16px 0 56px', height: 48 },
-          }}
+          mb="md"
         />
 
         <TextInput
           label="Nama Barang"
           placeholder="Masukkan nama barang"
-          {...form.getInputProps('name')}
+          value={data.name}
+          onChange={(e) => setData('name', e.target.value)}
+          error={errors.name}
           required
-          mt="md"
-          styles={{
-            wrapper: { marginBottom: 0 },
-            label: { marginBottom: 8 },
-            input: { padding: '0 16px 0 56px', height: 48 },
-          }}
+          mb="md"
         />
 
         <NumberInput
           label="Kuantitas"
           placeholder="Masukkan kuantitas barang"
-          {...form.getInputProps('quantity')}
+          value={data.quantity}
+          onChange={(value) => setData('quantity', value)}
+          error={errors.quantity}
           required
-          mt="md"
           min={1}
-          styles={{
-            wrapper: { marginBottom: 0 },
-            label: { marginBottom: 8 },
-            input: { padding: '0 16px 0 56px', height: 48 },
-          }}
+          mb="md"
         />
 
         <Select
           label="Satuan"
           placeholder="Pilih satuan"
+          value={data.unit}
+          onChange={(value) => setData('unit', value)}
           data={[
             { value: 'pcs', label: 'pcs' },
             { value: 'kg', label: 'kg' },
             { value: 'ltr', label: 'ltr' },
           ]}
-          {...form.getInputProps('unit')}
+          error={errors.unit}
           required
-          mt="md"
-          styles={{
-            wrapper: { marginBottom: 0 },
-            label: { marginBottom: 8 },
-            input: { padding: '0 16px 0 56px', height: 48 },
-          }}
+          mb="md"
         />
+
+        <Group position="right" mt="xl">
+          <Button type="submit" loading={processing}>
+            Simpan Perubahan
+          </Button>
+        </Group>
       </AuthenticatedLayout>
     </form>
   );

@@ -24,24 +24,48 @@ class BranchController extends Controller
     ]);
   }
 
+  public function warehouse_items_index(): Response
+  {
+    // Ambil user dengan role "Admin" dan relasi items
+    $admin = User::where('role', 'Admin')
+      ->with('items')
+      ->first();
+
+    // Pastikan user ditemukan
+    if (!$admin) {
+      abort(404, 'Admin not found');
+    }
+
+    // Format data items dengan menambahkan 'quantity' dari pivot
+    $items = $admin->items->map(function ($item) {
+      $item->quantity = $item->pivot->quantity; // Tambahkan quantity dari pivot
+      unset($item->pivot); // Hapus data pivot jika tidak diperlukan
+      return $item;
+    });
+
+    // Return the data to the Inertia view
+    return Inertia::render('Branches/WarehouseItemsIndex', [
+      'page_title' => 'Daftar Barang Warehouse',
+      'items' => $items,
+      'notification' => session()->pull('notification'),
+    ]);
+  }
+
+
   /**
    * Store a newly created resource in storage.
    */
   public function store(Request $request): RedirectResponse
   {
-    $validated = $request->validate([
-      'full_name' => 'required|string|max:255',
-      'phone_number' => 'required|string|max:15',
-      'email' => 'required|email|unique:users,email',
-      'password' => 'required|string|min:8',
-    ]);
+    $data = $request->all();
+    $data['role'] = 'Cabang';
 
-    User::create(array_merge($validated, ['role' => 'Cabang']));
+    User::create($data);
 
     return redirect()->route('branches.index')
       ->with('notification', [
         'status' => 'success',
-        'title' => 'Cabang berhasil ditambahkan',
+        'title' => 'Cabang Berhasil Ditambahkan',
         'message' => 'Cabang baru berhasil ditambahkan.',
       ]);
   }
@@ -83,25 +107,18 @@ class BranchController extends Controller
    */
   public function update(Request $request, User $branch): RedirectResponse
   {
-    $validated = $request->validate([
-      'full_name' => 'required|string|max:255',
-      'phone_number' => 'required|string|max:15',
-      'email' => 'required|email|unique:users,email,' . $branch->id,
-      'password' => 'nullable|string|min:8',
-    ]);
+    $data = $request->all();
 
-    if ($request->filled('password')) {
-      $validated['password'] = $request->input('password');
-    } else {
-      unset($validated['password']);
+    if (!$request->filled('password')) {
+      unset($data['password']);
     }
 
-    $branch->update($validated);
+    $branch->update($data);
 
     return redirect()->route('branches.index')
       ->with('notification', [
         'status' => 'success',
-        'title' => 'Cabang berhasil diperbarui',
+        'title' => 'Cabang Berhasil Diperbarui',
         'message' => 'Data cabang berhasil diperbarui.',
       ]);
   }
@@ -116,7 +133,7 @@ class BranchController extends Controller
     return redirect()->route('branches.index')
       ->with('notification', [
         'status' => 'success',
-        'title' => 'Cabang berhasil dihapus',
+        'title' => 'Cabang Berhasil Dihapus',
         'message' => 'Data cabang telah dihapus.',
       ]);
   }

@@ -10,8 +10,10 @@ return new class extends Migration {
    */
   public function up(): void
   {
-    Schema::create('drivers', function (Blueprint $table) {
-      $table->id();
+    Schema::create('order_items', function (Blueprint $table) {
+      $table->foreignUlid("order_id")->constrained();
+      $table->foreignUlid("item_id")->constrained();
+      $table->integer('quantity');
       $table->timestamps();
     });
   }
@@ -21,6 +23,6 @@ return new class extends Migration {
    */
   public function down(): void
   {
-    Schema::dropIfExists('drivers');
+    Schema::dropIfExists('order_items');
   }
 };

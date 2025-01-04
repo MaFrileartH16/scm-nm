@@ -18,6 +18,7 @@ class Order extends Model
     'branch_id',
     'status',
     'is_viewed',
+    'surat_jalan_url'
   ];
 
   protected $casts = [

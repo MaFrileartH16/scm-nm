@@ -16,6 +16,7 @@ return new class extends Migration {
       $table->foreignUlid('branch_id')->constrained('users', 'id');
       $table->string('status');
       $table->boolean('is_viewed')->default(false); // Kolom untuk menandai apakah order sudah dilihat
+      $table->string('surat_jalan_url')->nullable();
       $table->timestamps();
     });
   }

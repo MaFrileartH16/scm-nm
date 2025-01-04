@@ -21,6 +21,7 @@ Route::middleware('auth')->group(function () {
   Route::get('warehouse_items', [BranchController::class, 'warehouse_items_index'])->name('warehouse_items.index');
   Route::get('requests', [OrderController::class, 'index'])->name('requests');
   Route::get('delivieries', [OrderController::class, 'index'])->name('deliveries.index');
+  Route::get('surat-jalan', [OrderController::class, 'suratJalan'])->name('surat-jalan');
 
   Route::resource('couriers', CourierController::class);
   Route::resource('orders', OrderController::class);

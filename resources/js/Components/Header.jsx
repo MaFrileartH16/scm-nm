@@ -60,8 +60,16 @@ export const Header = (props) => {
                 icon: <IconDashboard />,
                 route: 'orders.index',
               },
-              { label: 'Print Surat Jalan', icon: <IconDashboard /> },
-              { label: 'Pengiriman', icon: <IconDashboard /> },
+              {
+                label: 'Print Surat Jalan',
+                icon: <IconDashboard />,
+                route: 'surat-jalan',
+              },
+              {
+                label: 'Pengiriman',
+                icon: <IconDashboard />,
+                route: 'orders.index',
+              },
             ],
           },
         ];

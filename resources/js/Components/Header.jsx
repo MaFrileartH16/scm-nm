@@ -68,7 +68,7 @@ export const Header = (props) => {
               {
                 label: 'Pengiriman',
                 icon: <IconDashboard />,
-                route: 'orders.index',
+                route: 'deliveries',
               },
             ],
           },
@@ -110,8 +110,9 @@ export const Header = (props) => {
                 route: 'orders.index',
               },
               {
-                label: 'Status Kurir',
+                label: 'Pengiriman',
                 icon: <IconDashboard />,
+                route: 'deliveries',
               },
               {
                 label: 'Stok Warehouse',

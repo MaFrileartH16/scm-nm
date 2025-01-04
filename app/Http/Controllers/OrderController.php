@@ -245,5 +245,59 @@ class OrderController extends Controller
     ]);
   }
 
+  public function deliveries(Request $request): Response
+  {
+    $user = Auth::user();
+    $userRole = $user->role;
+    $userId = $user->id;
+
+    $orders = Order::query()
+      ->when($userRole === 'Cabang', function ($query) use ($userId) {
+        // Filter orders by branch_id for Cabang role
+        $query->where('branch_id', $userId)->with('items');
+      })
+      ->when($userRole === 'Admin' || $userRole === 'Kurir', function ($query) {
+        // For Admin and Kurir roles, include all orders
+        $query->with(['items.item', 'statusProofs', 'branch']);
+      })
+      ->latest()
+      ->get()
+      ->map(function ($order) {
+        // Get the latest status proof entry manually
+        $latestProof = $order->statusProofs()->get()->last();
+
+        return [
+          'order_id' => $order->id,
+          'code' => $order->code,
+          'status' => $order->status,
+          'branch' => $order->branch ? [
+            'id' => $order->branch->id,
+            'name' => $order->branch->name,
+            'email' => $order->branch->email,
+            'phone_number' => $order->branch->phone_number,
+            'address' => $order->branch->address,
+          ] : null, // Include branch data if available
+          'items' => $order->items->map(function ($orderItem) {
+            return [
+              'id' => $orderItem->item->id,
+              'code' => $orderItem->item->code,
+              'name' => $orderItem->item->name,
+              'unit' => $orderItem->item->unit,
+              'quantity' => $orderItem->quantity,
+            ];
+          }),
+          'proof_image_path' => $latestProof && $latestProof->proof_image_path
+            ? Storage::url($latestProof->proof_image_path)
+            : null, // Generate full URL for the proof image
+          'created_at' => $order->created_at,
+          'updated_at' => $order->updated_at,
+        ];
+      });
+
+    return Inertia::render('Orders/Index', [
+      'page_title' => 'Daftar Pesanan',
+      'orders' => $orders,
+    ]);
+  }
 }
 

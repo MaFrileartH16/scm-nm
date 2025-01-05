@@ -73,23 +73,6 @@ const Orders = (props) => {
                   ))}
                 </Table.Tbody>
               </Table>
-              {userRole === 'Admin' || userRole === 'Kurir' ? (
-                <div style={{ marginTop: '16px' }}>
-                  <Title order={6}>Branch Information</Title>
-                  <p>
-                    <strong>Name:</strong> {order.branch?.name || '-'}
-                  </p>
-                  <p>
-                    <strong>Email:</strong> {order.branch?.email || '-'}
-                  </p>
-                  <p>
-                    <strong>Phone:</strong> {order.branch?.phone_number || '-'}
-                  </p>
-                  <p>
-                    <strong>Address:</strong> {order.branch?.address || '-'}
-                  </p>
-                </div>
-              ) : null}
             </Accordion.Panel>
           </Accordion.Item>
         </Accordion>
@@ -99,7 +82,7 @@ const Orders = (props) => {
       <Table.Td>
         {order.proof_image_path ? (
           <Image
-            src={order.proof_image_path} // Directly use the proof_image_path provided by the backend
+            src={order.proof_image_path}
             alt="Bukti Foto"
             width={100}
             height={100}
@@ -110,95 +93,119 @@ const Orders = (props) => {
         )}
       </Table.Td>
       <Table.Td>
-        {userRole === 'Admin' && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            {editingOrderId === order.order_id ? (
-              <>
-                <Select
-                  placeholder="Pilih Status"
-                  data={[
-                    { value: 'Setujui', label: 'Setujui' },
-                    { value: 'Batalkan', label: 'Batalkan' },
-                  ]}
-                  value={selectedStatus}
-                  onChange={(value) => setSelectedStatus(value)}
-                />
-                <Button
-                  size="xs"
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          {/* Tombol Surat Jalan hanya untuk Kurir */}
+          {userRole === 'Kurir' && order.surat_jalan_url && (
+            <Button
+              size="xs"
+              variant="light"
+              color="blue"
+              component="a"
+              href={order.surat_jalan_url}
+              target="_blank"
+            >
+              Surat Jalan
+            </Button>
+          )}
+          {/* Tombol Ubah Status untuk Admin */}
+          {userRole === 'Admin' && (
+            <>
+              {editingOrderId === order.order_id ? (
+                <>
+                  <Select
+                    placeholder="Pilih Status"
+                    data={[
+                      { value: 'Setujui', label: 'Setujui' },
+                      { value: 'Batalkan', label: 'Batalkan' },
+                    ]}
+                    value={selectedStatus}
+                    onChange={(value) => setSelectedStatus(value)}
+                  />
+                  <Button
+                    size="xs"
+                    variant="light"
+                    color="green"
+                    onClick={() =>
+                      handleStatusChange(order.order_id, selectedStatus)
+                    }
+                  >
+                    Simpan
+                  </Button>
+                </>
+              ) : (
+                <ActionIcon
+                  size="md"
+                  color="blue"
                   variant="light"
-                  color="green"
-                  onClick={() =>
-                    handleStatusChange(order.order_id, selectedStatus)
-                  }
+                  onClick={() => {
+                    setEditingOrderId(order.order_id);
+                    setSelectedStatus(order.status); // Set status to current order status
+                  }}
                 >
-                  Simpan
-                </Button>
-              </>
-            ) : (
-              <ActionIcon
-                size="md"
-                color="blue"
-                variant="light"
-                onClick={() => setEditingOrderId(order.order_id)}
-              >
-                <IconEdit />
-              </ActionIcon>
-            )}
-          </div>
-        )}
-        {userRole === 'Kurir' && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            {editingOrderId === order.order_id ? (
-              <>
-                <Select
-                  placeholder="Pilih Status"
-                  data={[
-                    { value: 'Memuat', label: 'Memuat' },
-                    { value: 'Dikirim', label: 'Dikirim' },
-                    { value: 'Selesai', label: 'Selesai' },
-                  ]}
-                  value={selectedStatus}
-                  onChange={(value) => setSelectedStatus(value)}
-                />
-                <FileInput
-                  placeholder="Upload Bukti"
-                  accept="image/*"
-                  onChange={setProofImage}
-                  icon={<IconUpload size={14} />}
-                />
-                <Button
-                  size="xs"
+                  <IconEdit />
+                </ActionIcon>
+              )}
+            </>
+          )}
+          {/* Tombol Ubah Status untuk Kurir */}
+          {userRole === 'Kurir' && (
+            <>
+              {editingOrderId === order.order_id ? (
+                <>
+                  <Select
+                    placeholder="Pilih Status"
+                    data={[
+                      { value: 'Memuat', label: 'Memuat' },
+                      { value: 'Dikirim', label: 'Dikirim' },
+                      { value: 'Selesai', label: 'Selesai' },
+                    ]}
+                    value={selectedStatus}
+                    onChange={(value) => setSelectedStatus(value)}
+                  />
+                  <FileInput
+                    placeholder="Upload Bukti"
+                    accept="image/*"
+                    onChange={setProofImage}
+                    icon={<IconUpload size={14} />}
+                  />
+                  <Button
+                    size="xs"
+                    variant="light"
+                    color="green"
+                    onClick={() =>
+                      handleStatusChange(order.order_id, selectedStatus)
+                    }
+                  >
+                    Simpan
+                  </Button>
+                </>
+              ) : (
+                <ActionIcon
+                  size="md"
+                  color="blue"
                   variant="light"
-                  color="green"
-                  onClick={() =>
-                    handleStatusChange(order.order_id, selectedStatus)
-                  }
+                  onClick={() => {
+                    setEditingOrderId(order.order_id);
+                    setSelectedStatus(order.status); // Set status to current order status
+                  }}
                 >
-                  Simpan
-                </Button>
-              </>
-            ) : (
-              <ActionIcon
-                size="md"
-                color="blue"
-                variant="light"
-                onClick={() => setEditingOrderId(order.order_id)}
-              >
-                <IconEdit />
-              </ActionIcon>
-            )}
-          </div>
-        )}
-        {userRole === 'Cabang' && (
-          <ActionIcon
-            size="md"
-            color="red"
-            variant="light"
-            onClick={() => handleDeleteOrder(order.order_id)}
-          >
-            <IconTrash />
-          </ActionIcon>
-        )}
+                  <IconEdit />
+                </ActionIcon>
+              )}
+            </>
+          )}
+          {/* Tombol Hapus untuk Cabang */}
+          {userRole === 'Cabang' && (
+            <ActionIcon
+              size="md"
+              color="red"
+              variant="light"
+              onClick={() => handleDeleteOrder(order.order_id)}
+            >
+              <IconTrash />
+            </ActionIcon>
+          )}
+        </div>
       </Table.Td>
     </Table.Tr>
   ));
@@ -214,13 +221,12 @@ const Orders = (props) => {
       }}
     >
       <Group justify="space-between">
-        <Title>Daftar Pesanan</Title>
-        {userRole !== 'Kurir' ||
-          (userRole !== 'Admin' && (
-            <Button onClick={() => router.get(route('warehouse_items.index'))}>
-              Tambah Pesanan
-            </Button>
-          ))}
+        <Title>Daftar Permintaan</Title>
+        {userRole !== 'Kurir' && userRole !== 'Admin' && (
+          <Button onClick={() => router.get(route('warehouse_items.index'))}>
+            Tambah Pesanan
+          </Button>
+        )}
       </Group>
 
       <Card shadow="sm" p="lg" radius="md" withBorder>

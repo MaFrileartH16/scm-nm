@@ -60,13 +60,16 @@ class OrderController extends Controller
           'proof_image_path' => $latestProof && $latestProof->proof_image_path
             ? Storage::url($latestProof->proof_image_path)
             : null, // Generate full URL for the proof image
+          'surat_jalan_url' => $order->surat_jalan_url
+            ? Storage::url($order->surat_jalan_url) // Convert to full URL
+            : null,
           'created_at' => $order->created_at,
           'updated_at' => $order->updated_at,
         ];
       });
 
-    return Inertia::render('Orders/Index', [
-      'page_title' => 'Daftar Pesanan',
+    return Inertia::render('Orders/SuratJalan', [
+      'page_title' => 'Surat Jalan',
       'orders' => $orders,
     ]);
   }
